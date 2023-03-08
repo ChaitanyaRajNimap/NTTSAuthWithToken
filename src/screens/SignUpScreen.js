@@ -1,4 +1,4 @@
-import React, {useState, createRef} from 'react';
+import React, {useState, useEffect, createRef} from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {COLORS} from '../utils/Theme';
 import CustomLongBtn from '../components/CustomLongBtn';
 import CustomTextInput from '../components/CustomTextInput';
 import validate from '../utils/Validation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignUpScreen = ({navigation, onSignUp}) => {
   const [inputs, setInputs] = useState({
@@ -31,10 +32,42 @@ const SignUpScreen = ({navigation, onSignUp}) => {
   const emailRef = createRef();
   const passwordRef = createRef();
 
+  useEffect(() => {
+    removeValue = async () => {
+      try {
+        await AsyncStorage.removeItem('userData');
+      } catch (e) {
+        // remove error
+        alert('Error in removing users infomation', e.message);
+      }
+
+      console.log('userData removed.');
+    };
+    removeValue();
+  }, []);
+
+  //For strong new user data to async storage
+  const storeData = async value => {
+    if (value) {
+      try {
+        const jsonValue = JSON.stringify(value);
+        await AsyncStorage.setItem('userData', jsonValue);
+      } catch (e) {
+        // saving error
+        alert('Error in saving users infomation', e.message);
+      }
+    }
+  };
+
   const handleSignUp = () => {
     let nameErr = validate.validateName(inputs.name);
     let emailErr = validate.validateEmail(inputs.email);
     let passwordErr = validate.validatePassword(inputs.password);
+
+    let dataToPass = {
+      emailVal: inputs.email,
+      passwordVal: inputs.password,
+    };
 
     if (!nameErr && !emailErr && !passwordErr) {
       setInputs(prevIp => {
@@ -53,7 +86,9 @@ const SignUpScreen = ({navigation, onSignUp}) => {
           passwordError: null,
         };
       });
-      onSignUp();
+      storeData(dataToPass);
+      // onSignUp();
+      navigation.navigate('SignIn');
     } else {
       setErrors(prevErr => {
         return {

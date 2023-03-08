@@ -14,6 +14,7 @@ import {COLORS} from '../utils/Theme';
 import CustomLongBtn from '../components/CustomLongBtn';
 import CustomTextInput from '../components/CustomTextInput';
 import validate from '../utils/Validation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignInScreen = ({navigation, onSignIn}) => {
   const [inputs, setInputs] = useState({
@@ -28,26 +29,50 @@ const SignInScreen = ({navigation, onSignIn}) => {
   const emailRef = createRef();
   const passwordRef = createRef();
 
+  //For getting userData from async storage
+  const getUserData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('userData');
+      // return jsonValue != null ? JSON.parse(jsonValue) : null;
+      jsonValue != null ? JSON.parse(jsonValue) : null;
+      return jsonValue;
+    } catch (e) {
+      // read error
+      alert('Error in getting users infomation', e.message);
+    }
+
+    console.log('Done.');
+  };
+
   const handleSignIn = () => {
     let emailErr = validate.validateEmail(inputs.email);
     let passwordErr = validate.validatePassword(inputs.password);
 
     if (!emailErr && !passwordErr) {
-      setInputs(prevIp => {
-        return {
-          ...prevIp,
-          email: null,
-          password: null,
-        };
+      getUserData().then(res => {
+        const uData = JSON.parse(res);
+        let uEmail = uData.emailVal;
+        let uPassword = uData.passwordVal;
+        if (inputs.email === uEmail && inputs.password === uPassword) {
+          setInputs(prevIp => {
+            return {
+              ...prevIp,
+              email: null,
+              password: null,
+            };
+          });
+          setErrors(prevErr => {
+            return {
+              ...prevErr,
+              emailError: null,
+              passwordError: null,
+            };
+          });
+          onSignIn();
+        } else {
+          alert(`Credential dosen't matched! \nPlease check your credentials.`);
+        }
       });
-      setErrors(prevErr => {
-        return {
-          ...prevErr,
-          emailError: null,
-          passwordError: null,
-        };
-      });
-      onSignIn();
     } else {
       setErrors(prevErr => {
         return {

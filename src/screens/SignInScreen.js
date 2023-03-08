@@ -9,11 +9,11 @@ import {
   Keyboard,
   TouchableOpacity,
 } from 'react-native';
+import {GLOBALSTYLES} from '../utils/Theme';
+import {COLORS} from '../utils/Theme';
 import CustomLongBtn from '../components/CustomLongBtn';
 import CustomTextInput from '../components/CustomTextInput';
 import validate from '../utils/Validation';
-import {GLOBALSTYLES} from '../utils/Theme';
-import {COLORS} from '../utils/Theme';
 
 const SignInScreen = ({navigation, onSignIn}) => {
   const [inputs, setInputs] = useState({

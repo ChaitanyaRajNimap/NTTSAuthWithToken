@@ -14,7 +14,8 @@ import {COLORS} from '../utils/Theme';
 import CustomLongBtn from '../components/CustomLongBtn';
 import CustomTextInput from '../components/CustomTextInput';
 import validate from '../utils/Validation';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 
 const SignInScreen = ({navigation, onSignIn}) => {
   const [inputs, setInputs] = useState({
@@ -30,30 +31,29 @@ const SignInScreen = ({navigation, onSignIn}) => {
   const passwordRef = createRef();
 
   //For getting userData from async storage
-  const getUserData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem('userData');
-      // return jsonValue != null ? JSON.parse(jsonValue) : null;
-      jsonValue != null ? JSON.parse(jsonValue) : null;
-      return jsonValue;
-    } catch (e) {
-      // read error
-      alert('Error in getting users infomation', e.message);
-    }
+  // const getUserData = async () => {
+  //   try {
+  //     const jsonValue = await AsyncStorage.getItem('userData');
+  //     // return jsonValue != null ? JSON.parse(jsonValue) : null;
+  //     jsonValue != null ? JSON.parse(jsonValue) : null;
+  //     return jsonValue;
+  //   } catch (e) {
+  //     // read error
+  //     alert('Error in getting users infomation', e.message);
+  //   }
 
-    console.log('Done.');
-  };
+  //   console.log('Done.');
+  // };
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     let emailErr = validate.validateEmail(inputs.email);
     let passwordErr = validate.validatePassword(inputs.password);
 
     if (!emailErr && !passwordErr) {
-      getUserData().then(res => {
-        const uData = JSON.parse(res);
-        let uEmail = uData.emailVal;
-        let uPassword = uData.passwordVal;
-        if (inputs.email === uEmail && inputs.password === uPassword) {
+      const credentials = await Keychain.getGenericPassword();
+      if (credentials) {
+        const {emailVal, passwordVal} = JSON.parse(credentials.password);
+        if (inputs.email === emailVal && inputs.password === passwordVal) {
           setInputs(prevIp => {
             return {
               ...prevIp,
@@ -72,7 +72,49 @@ const SignInScreen = ({navigation, onSignIn}) => {
         } else {
           alert(`Credential dosen't matched! \nPlease check your credentials.`);
         }
-      });
+      } else {
+        alert(
+          `No user data found for given credentials \nPlease register first if new user`,
+        );
+        setInputs(prevIp => {
+          return {
+            ...prevIp,
+            email: null,
+            password: null,
+          };
+        });
+        setErrors(prevErr => {
+          return {
+            ...prevErr,
+            emailError: null,
+            passwordError: null,
+          };
+        });
+      }
+      // getUserData().then(res => {
+      //   const uData = JSON.parse(res);
+      //   let uEmail = uData.emailVal;
+      //   let uPassword = uData.passwordVal;
+      //   if (inputs.email === uEmail && inputs.password === uPassword) {
+      //     setInputs(prevIp => {
+      //       return {
+      //         ...prevIp,
+      //         email: null,
+      //         password: null,
+      //       };
+      //     });
+      //     setErrors(prevErr => {
+      //       return {
+      //         ...prevErr,
+      //         emailError: null,
+      //         passwordError: null,
+      //       };
+      //     });
+      //     onSignIn();
+      //   } else {
+      //     alert(`Credential dosen't matched! \nPlease check your credentials.`);
+      //   }
+      // });
     } else {
       setErrors(prevErr => {
         return {

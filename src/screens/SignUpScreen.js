@@ -14,7 +14,8 @@ import {COLORS} from '../utils/Theme';
 import CustomLongBtn from '../components/CustomLongBtn';
 import CustomTextInput from '../components/CustomTextInput';
 import validate from '../utils/Validation';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 
 const SignUpScreen = ({navigation, onSignUp}) => {
   const [inputs, setInputs] = useState({
@@ -32,39 +33,39 @@ const SignUpScreen = ({navigation, onSignUp}) => {
   const emailRef = createRef();
   const passwordRef = createRef();
 
-  useEffect(() => {
-    removeValue = async () => {
-      try {
-        await AsyncStorage.removeItem('userData');
-      } catch (e) {
-        // remove error
-        alert('Error in removing users infomation', e.message);
-      }
+  // useEffect(() => {
+  //   removeValue = async () => {
+  //     try {
+  //       await AsyncStorage.removeItem('userData');
+  //     } catch (e) {
+  //       // remove error
+  //       alert('Error in removing users infomation', e.message);
+  //     }
 
-      console.log('userData removed.');
-    };
-    removeValue();
-  }, []);
+  //     console.log('userData removed.');
+  //   };
+  //   removeValue();
+  // }, []);
 
   //For strong new user data to async storage
-  const storeData = async value => {
-    if (value) {
-      try {
-        const jsonValue = JSON.stringify(value);
-        await AsyncStorage.setItem('userData', jsonValue);
-      } catch (e) {
-        // saving error
-        alert('Error in saving users infomation', e.message);
-      }
-    }
-  };
+  // const storeData = async value => {
+  //   if (value) {
+  //     try {
+  //       const jsonValue = JSON.stringify(value);
+  //       await AsyncStorage.setItem('userData', jsonValue);
+  //     } catch (e) {
+  //       // saving error
+  //       alert('Error in saving users infomation', e.message);
+  //     }
+  //   }
+  // };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let nameErr = validate.validateName(inputs.name);
     let emailErr = validate.validateEmail(inputs.email);
     let passwordErr = validate.validatePassword(inputs.password);
 
-    let dataToPass = {
+    let credentials = {
       emailVal: inputs.email,
       passwordVal: inputs.password,
     };
@@ -86,9 +87,14 @@ const SignUpScreen = ({navigation, onSignUp}) => {
           passwordError: null,
         };
       });
-      storeData(dataToPass);
+      // storeData(dataToPass);
       // onSignUp();
-      navigation.navigate('SignIn');
+      try {
+        await Keychain.setGenericPassword('token', JSON.stringify(credentials));
+        navigation.navigate('SignIn');
+      } catch (error) {
+        console.log('Response in storing crediential in keychain', error);
+      }
     } else {
       setErrors(prevErr => {
         return {

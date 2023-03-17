@@ -1,29 +1,11 @@
-import React, {useEffect} from 'react';
-import {View, Text, StyleSheet, SafeAreaView} from 'react-native';
+import React from 'react';
+import {Text, StyleSheet, SafeAreaView} from 'react-native';
 import CustomSmallBtn from '../components/CustomSmallBtn';
 import {GLOBALSTYLES} from '../utils/Theme';
 import {COLORS} from '../utils/Theme';
-import * as Keychain from 'react-native-keychain';
 
-const LandingScreen = ({navigation, onAppStateChange}) => {
-  handleRegister = () => navigation.navigate('SignUp');
+const LandingScreen = ({navigation}) => {
   handleSignIn = () => navigation.navigate('SignIn');
-
-  useEffect(() => {
-    console.log('Called!');
-    const updateAppState = async () => {
-      try {
-        const creds = await Keychain.getGenericPassword();
-        console.log('CREDSSS : ===>', creds);
-        if (creds) {
-          onAppStateChange(true);
-        }
-      } catch (err) {
-        console.log("Keychain couldn't be accessed!", err);
-      }
-    };
-    updateAppState();
-  }, []);
 
   return (
     <SafeAreaView style={[GLOBALSTYLES.rootContainer, styles.SafeAreaView]}>
@@ -34,10 +16,7 @@ const LandingScreen = ({navigation, onAppStateChange}) => {
         Explore all the most exiting jobs roles {'\n'} based on your interest
         And study major
       </Text>
-      <View style={styles.btnContainer}>
-        <CustomSmallBtn title="Register" onPress={handleRegister} />
-        <CustomSmallBtn title="Sign In" onPress={handleSignIn} />
-      </View>
+      <CustomSmallBtn title="Sign In" onPress={handleSignIn} />
     </SafeAreaView>
   );
 };
@@ -51,18 +30,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subHeading: {
+    marginBottom: 10,
     color: COLORS.grey100,
     fontSize: 16,
     lineHeight: 25,
     textAlign: 'center',
-  },
-  btnContainer: {
-    width: 345,
-    marginTop: 80,
-    padding: 1,
-    backgroundColor: COLORS.white100,
-    borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
 });

@@ -137,7 +137,7 @@ const SignUpScreen = ({navigation, onSignUp}) => {
                     };
                   });
                 }}
-                ref={nameRef}
+                // ref={nameRef}
                 onSubmitEditing={emailRef.current && emailRef.current.focus()}
               />
               <Text style={styles.error}>{errors.nameError}</Text>
@@ -161,10 +161,10 @@ const SignUpScreen = ({navigation, onSignUp}) => {
                     };
                   });
                 }}
-                ref={emailRef}
-                onSubmitEditing={
-                  passwordRef.current && passwordRef.current.focus()
-                }
+                // ref={emailRef}
+                // onSubmitEditing={
+                //   passwordRef.current && passwordRef.current.focus()
+                // }
               />
               <Text style={styles.error}>{errors.emailError}</Text>
             </View>
@@ -187,8 +187,8 @@ const SignUpScreen = ({navigation, onSignUp}) => {
                     };
                   });
                 }}
-                ref={passwordRef}
-                onSubmitEditing={Keyboard.dismiss}
+                // ref={passwordRef}
+                // onSubmitEditing={Keyboard.dismiss}
                 secureTextEntry={true}
                 maxLength={6}
               />

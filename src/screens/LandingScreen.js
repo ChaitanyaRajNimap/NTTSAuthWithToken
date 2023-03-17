@@ -1,12 +1,29 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, SafeAreaView} from 'react-native';
 import CustomSmallBtn from '../components/CustomSmallBtn';
 import {GLOBALSTYLES} from '../utils/Theme';
 import {COLORS} from '../utils/Theme';
+import * as Keychain from 'react-native-keychain';
 
-const LandingScreen = ({navigation}) => {
+const LandingScreen = ({navigation, onAppStateChange}) => {
   handleRegister = () => navigation.navigate('SignUp');
   handleSignIn = () => navigation.navigate('SignIn');
+
+  useEffect(() => {
+    console.log('Called!');
+    const updateAppState = async () => {
+      try {
+        const creds = await Keychain.getGenericPassword();
+        console.log('CREDSSS : ===>', creds);
+        if (creds) {
+          onAppStateChange(true);
+        }
+      } catch (err) {
+        console.log("Keychain couldn't be accessed!", err);
+      }
+    };
+    updateAppState();
+  }, []);
 
   return (
     <SafeAreaView style={[GLOBALSTYLES.rootContainer, styles.SafeAreaView]}>

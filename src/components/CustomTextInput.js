@@ -13,9 +13,9 @@ const CustomTextInput = props => {
       value={props.value}
       placeholder={props.placeholder}
       onChangeText={handleChange}
-      ref={props.ref}
-      returnKeyType="Next"
-      onSubmitEditing={props.onSubmitEditing}
+      // ref={props.ref}
+      // returnKeyType="Next"
+      // onSubmitEditing={props.onSubmitEditing}
     />
   );
 };

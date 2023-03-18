@@ -19,13 +19,12 @@ const App = () => {
     const getToken = async () => {
       try {
         const token = await Keychain.getGenericPassword();
-        console.log('TOKEN IN APP : ', token);
+        if (token) {
+          setAuthToken(token);
+          setIsAuthenticated(true);
+        }
       } catch (err) {
         console.log(`Keychain couldn't be accessed!`, err);
-      }
-      if (token) {
-        setAuthToken(token);
-        setIsAuthenticated(true);
       }
     };
     getToken();
